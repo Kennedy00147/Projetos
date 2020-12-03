@@ -1,0 +1,189 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <string.h> 
+#include <stdlib.h>
+#include <locale.h> // Inclui acentos da lingua portuguesa
+
+struct contatos { // Abertura da agenda
+    char nome[50], sobrenome[100], email[100], ntelefone[12], n2telefone[12]{ "Não consta" };
+};
+
+FILE* arq1; // Leitura humana, apenas para ver os contatos salvos
+FILE* arq2; // Leitura de máquina
+FILE* temp; // Arquivo temporário para excluir contatos
+struct contatos reg[100];
+int qtd_contatos = 0;
+
+void inserir() {
+    char telefonesaida, saida;
+    // Entrada dos dados do contato
+    do {
+        char n2telefone[12]{ "Não consta" }; // Loop para limpar o 2º nº de telefone
+        arq1 = fopen("contatos1.dat", "a"); // Humano
+        arq2 = fopen("contatos2.dat", "a"); // Maquina
+        system("cls");
+        printf("----- \t Adicionar contatos \t ----- \n\n");
+        fflush(stdin);
+        printf("Entre com o nome do contato: \n\n");
+        scanf("%s", reg[qtd_contatos].nome);
+        fflush(stdin);
+        printf("Entre com o sobrenome do contato: \n\n");
+        scanf("%s", reg[qtd_contatos].sobrenome);
+        fflush(stdin);
+        printf("Entre com o número de telefone do contato: \n\n");
+        scanf(" %s", reg[qtd_contatos].ntelefone);
+        // Perguntando se deseja adicionar mais de 1 numero
+        printf("---   Deseja adicionar um segundo número? 'S' Para SIM 'N' Para Não   ---\n\n");
+        scanf(" %c", &telefonesaida);
+        // Opção para adicionar mais de 1 numero
+        if (telefonesaida == 'S' || telefonesaida == 's') {
+            fflush(stdin);
+            printf("Digite o segundo número de telefone do contato: \n\n");
+            scanf(" %s", reg[qtd_contatos].n2telefone);
+        }
+        fflush(stdin);
+        printf("Entre com o email do contato : \n\n");
+        scanf(" %s", reg[qtd_contatos].email);
+        // Printando os dados do contato no arquivo de visualização humana 
+        fprintf(arq1, " Nome: %s\t Sobrenome: %s\t Número de telefone: %s\t Email: %s\t\n", reg[qtd_contatos].nome, reg[qtd_contatos].sobrenome, reg[qtd_contatos].ntelefone, reg[qtd_contatos].email);
+        fclose(arq1);
+        // Printando os dados do contato no arquivo de visualização de máquina
+        fwrite(&reg[qtd_contatos], sizeof(struct contatos), 1, arq2);
+        fclose(arq2);
+        printf("\n");
+        printf("Contato adicionado com sucesso! \n\n");
+        // Opção de retorno 
+        printf("---   Deseja continuar? 'S' Para SIM 'N' Para Não   ---\n\n");
+        scanf(" %c", &saida);
+        qtd_contatos++;
+    } while (saida == 'S' || saida == 's');
+}
+
+void pesquisar() {
+    char saida, inome[50], isobrenome[50];
+    int aux = 0;
+    do { // Entrada do nome a ser pesquisado
+        arq2 = fopen("contatos2.dat", "r");
+        system("cls");
+        printf("----- \t Pesquisar contatos \t ----- \n\n");
+        fflush(stdin);
+        printf("Digite o nome do contato a ser pesquisado: \n\n");
+        scanf("%s", inome);
+        fflush(stdin);
+        printf("Digite o sobrenome do contato a ser pesquisado: \n\n");
+        scanf("%s", isobrenome);
+        // Execução da pesquisa de contatos
+        aux = 0; // Loop para o programa detectar contatos que não estão salvos
+        while (fread(&reg[qtd_contatos], sizeof(contatos), 1, arq2) == 1) {
+            if (strcmp(inome, reg[qtd_contatos].nome) == 0 && strcmp(isobrenome, reg[qtd_contatos].sobrenome) == 0) { // Strcmp compara 2 strings
+                aux = 1;
+                printf("Os dados do contato %s são: \n\n", reg[qtd_contatos].nome);
+                printf("Nome: %s \n\n", reg[qtd_contatos].nome);
+                printf("Sobrenome: %s \n\n", reg[qtd_contatos].sobrenome);
+                printf("Número de telefone: %s \n\n", reg[qtd_contatos].ntelefone);
+                printf("Segundo número de telefone: %s \n\n", reg[qtd_contatos].n2telefone);
+                printf("Email: %s \n\n", reg[qtd_contatos].email);
+            }
+        }
+        if (aux == 0) printf("Contato não encontrado! \n\n");
+        fclose(arq2);
+        // Opção de retorno 
+        printf("---   Deseja continuar? 'S' Para SIM 'N' Para Não   ---\n\n");
+        scanf(" %c", &saida);
+    } while (saida == 'S' || saida == 's');
+}
+
+void listar() {
+    char saida;
+    do { // Listagem dos contatos
+        arq2 = fopen("contatos2.dat", "r");
+        system("cls");
+        printf("----- \t Listar contatos \t ----- \n\n");
+        while (fread(&reg[qtd_contatos], sizeof(contatos), 1, arq2) == 1) {
+            printf("Nome: %s\n\n [ Sobrenome: %s\t Número de telefone: %s\t Segundo número de telefone: %s\t Email: %s ] \n\n", reg[qtd_contatos].nome, reg[qtd_contatos].sobrenome, reg[qtd_contatos].ntelefone, reg[qtd_contatos].n2telefone, reg[qtd_contatos].email);
+        }
+        fclose(arq2);
+        // Opção de retorno 
+        printf("---   Deseja continuar? 'S' Para SIM 'N' Para Não   ---\n\n");
+        scanf(" %c", &saida);
+    } while (saida == 'S' || saida == 's');
+}
+
+void excluir() {
+    char saida, inome[50], isobrenome[50];
+    int aux = 0;
+    do { // Entrada do contato
+        arq2 = fopen("contatos2.dat", "r");
+        temp = fopen("temp.dat", "w");
+        system("cls");
+        printf("----- \t Excluir contatos \t ----- \n\n");
+        fflush(stdin);
+        printf("Digite o nome do contato a ser excluído: \n\n");
+        scanf("%s", inome);
+        fflush(stdin);
+        printf("Digite o sobrenome do contato a ser excluído: \n\n");
+        scanf("%s", isobrenome);
+        // Operação de exclusão
+        aux = 0; // Loop para o programa detectar contatos que não estão salvos
+        while (fread(&reg[qtd_contatos], sizeof(contatos), 1, arq2) == 1) {
+            if (strcmp(inome, reg[qtd_contatos].nome) == 0 && strcmp(isobrenome, reg[qtd_contatos].sobrenome) == 0) { // Strcmp compara 2 strings
+                aux = 1;
+                printf("Contato excluído com sucesso! \n\n");
+            }
+            else {
+                fwrite(&reg[qtd_contatos], sizeof(contatos), 1, temp);
+            }
+        }
+        if (aux == 0) printf("Contato não encontrado! \n\n");
+        fclose(temp);
+        fclose(arq2);
+        remove("contatos2.dat"); // Exclui contatos2.dat
+        rename("temp.dat", "contatos2.dat"); // Muda o nome de temp para contatos2
+   // Opção de retorno
+        printf("Deseja continuar? 'S' Para SIM 'N' Para Não \n\n");
+        scanf(" %c", &saida);
+    } while (saida == 'S' || saida == 's');
+}
+
+int main() {
+    setlocale(LC_ALL, "Portuguese"); // Seta como portugues a lingua usada no programa
+    int opcao;
+    do {
+        system("cls"); // Função para limpar a tela
+        // Pequeno cabeçalho
+        printf("\n");
+        printf("----- \t Agenda de Contatos \t ----- \n\n");
+        printf("----- \t Seja Bem-vindo!!! \t     ----- \n\n");
+        printf("\n");
+        // Escolha de opções
+        printf("Escolha uma opção : \n\n");
+        printf(" 1 - Para adicionar um contato a lista \n\n");
+        printf(" 2 - Para pesquisar um contato da lista \n\n");
+        printf(" 3 - Para listar os contatos da lista \n\n");
+        printf(" 4 - Para excluir um contato da lista \n\n");
+        printf(" 5 - Para Sair da Agenda de contatos \n\n");
+        scanf("%d", &opcao);
+
+        // Analise das opções com switch
+        switch (opcao) {
+        case 1:
+            inserir();
+            break;
+        case 2:
+            pesquisar();
+            break;
+        case 3:
+            listar();
+            break;
+        case 4:
+            excluir();
+            break;
+        case 5:
+            system("cls");
+            printf("---   Saindo da Agenda!!!   ---\n\n ---   Até a proxima !!!   --- \n\n");
+            break;
+        default: // Opção Inválida
+            break;
+        }
+    } while (opcao != 5);
+}
