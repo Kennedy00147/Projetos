@@ -1,0 +1,131 @@
+#include <stdio.h>
+#include <string.h> 
+#include <stdlib.h>
+
+
+struct contatos { // ABERTURA DA AGENDA
+  char nome[50],sobrenome[100],email[100],ntelefone[12];
+};
+
+int main() {
+  int opcao,i=0;
+  char saida,inome[50];
+  struct contatos reg[100];
+  int qtd_contatos = 0;
+  int aux = 0; // AUXILIAR
+  char inexistente[20] = "INEXSISTENTE"; // FUNÇÃO EXCLUIR
+  // INICIO DO PROGRAMA
+  do {
+   system ("clear"); // LIMPAR A TELA
+   // PEQUENO CABEÇALHO
+   printf("\n");
+   printf("----- \t Agenda de Contatos \t ----- \n\n");
+   printf("----- \t Seja Bem-vindo!!! \t     ----- \n\n");
+   printf("\n");
+   // ESCOLHA DE OPÇÕES
+   printf("Escolha uma opção : \n\n");
+   printf(" 1 - Para adicionar um contato a lista \n\n");
+   printf(" 2 - Para pesquisar um contato da lista \n\n");
+   printf(" 3 - Para listar os contatos da lista \n\n");
+   printf(" 4 - Para excluir um contato da lista \n\n");
+   printf(" 5 - Sair da Agenda de contatos \n\n");
+   scanf("%d", &opcao);
+  
+   // ANALISE DAS OPÇÕES
+   switch(opcao) {
+   case 1: // OPÇÃO DE ADICIONAR CONTATOS
+     do { // ENTRADA DOS DADOS DO CONTATO
+       system ("clear");
+       printf("----- \t Adicionar contatos \t ----- \n\n");
+       printf("Entre com o nome do contato: \n\n");
+       scanf("%s", reg[qtd_contatos].nome);
+       printf("Entre com o sobrenome do contato: \n\n");
+       scanf("%s", reg[qtd_contatos].sobrenome);
+       printf("Entre com o número de telefone do contato sem hífen : \n\n");
+       scanf(" %s", reg[qtd_contatos].ntelefone);
+       printf("Entre com o email do contato : \n\n");
+       scanf(" %s", reg[qtd_contatos].email);
+       printf("\n");
+       printf("Contato adicionado com sucesso! \n\n");
+       // OPÇÃO DE RETORNO 
+       printf("---   Deseja continuar? 'S' Para SIM 'N' Para Não   ---\n\n");
+       printf("---   Por favor digite os caracteres Maiúsculos   ---\n\n");
+       scanf(" %c", &saida);
+       qtd_contatos++;
+      } while (saida != 'N');
+     break;
+   case 2: // OPÇÃO DE PESQUISAR CONTATOS
+     do { // ENTRADA DO NOME A SER PESQUISADO
+       system ("clear");
+       printf("----- \t Pesquisar contatos \t ----- \n\n");
+       printf("Entre com o nome do contato a ser pesquisado: \n\n");
+       scanf("%s", inome);
+       // EXECUÇÃO DA PESQUISA
+       aux = 0; // AUXILIAR PARA CONTATOS NÃO EXISTENTES
+       for (i=0; i<=qtd_contatos;i++) {
+         if (strcmp(inome,reg[i].nome)==0) { // STRCMP COMPARA 2 STRINGS
+           aux = 1;
+           printf("Os dados do contato %s são: \n\n", reg[i].nome);
+           printf("Nome: %s \n\n", reg[i].nome);
+           printf("Sobrenome: %s \n\n", reg[i].sobrenome);
+           printf("Número de telefone: %s \n\n", reg[i].ntelefone);
+           printf("Email: %s \n\n", reg[i].email);
+          }
+        }
+       if (aux == 0) printf("Contato não encontrado! \n\n"); 
+       // OPÇÃO DE RETORNO 
+       printf("---   Deseja continuar? 'S' Para SIM 'N' Para Não   ---\n\n");
+       printf("---   Por favor digite os caracteres Maiúsculos   ---\n\n");
+       scanf(" %c", &saida);
+      } while (saida != 'N');
+    break;
+   case 3: // OPÇÃO LISTAR CONTATOS
+     do { // LISTAGEM DOS CONTATOS
+       system ("clear");
+       printf("----- \t Listar contatos \t ----- \n\n");
+       printf("Os contatos salvos na agenda são: \n\n");
+       for (i=0; i<qtd_contatos; i++) {
+         if (strcmp(reg[i].nome,inexistente)==0) { // STRCMP PARA N LISTAR OS CONTATOS COM NOME INEXISTENTE
+         } else {
+       printf("Nome: %s\n\n [ Sobrenome: %s\t Número de telefone: %s\t Email: %s ] \n\n",reg[i].nome,reg[i].sobrenome,reg[i].ntelefone,reg[i].email);
+      }
+      }
+       // OPÇÃO DE RETORNO 
+       printf("---   Deseja continuar? 'S' Para SIM 'N' Para Não   ---\n\n");
+       printf("---   Por favor digite os caracteres Maiúsculos   ---\n\n");
+       scanf(" %c", &saida);
+       i++;
+      } while (saida != 'N');
+   break;
+   case 4: // OPÇÃO EXCLUIR CONTATOS
+     do { // ENTRADA DO CONTATO
+       system ("clear");
+       printf("----- \t Excluir contatos \t ----- \n\n");
+       printf("Entre com o nome do contato a ser excluido: \n\n");
+       scanf("%s", inome);
+       // OPERAÇÃO DE EXCLUSÃO
+       aux =0;
+       for (i=0;i<=qtd_contatos;i++) {
+         if (strcmp(inome,reg[i].nome)==0) {
+           aux = 1;
+           strcpy(reg[i].nome,inexistente); // ATRIBUIR NOME INEXISTENTE PARA EXCLUIR
+           printf("Contato excluido com sucesso! \n\n");
+         }
+       }
+       if (aux == 0) printf("Contato não encontrado! \n\n"); 
+       // OPÇÃO DE RETORNO 
+       printf("Deseja continuar? 'S' Para SIM 'N' Para Não \n\n");
+       printf("Por favor digite os caracteres Maiúsculos \n\n");
+       scanf(" %c", &saida);
+       i++;
+      } while (saida != 'N');
+   break;
+   case 5: // OPÇÃO SAIR DA AGENDA
+   system ("clear");
+   printf(" Saindo da Agenda! \n \n Até a proxima :D \n\n");
+   break;
+   default: // OPÇÃO INVALIDA
+  break;
+  } 
+  }while(opcao != 5); 
+}
